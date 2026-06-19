@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KYRO | Project</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        /* ===== RESET & GLOBAL ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: #d0d0d0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== LANDING ===== */
+        #landing {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            min-height: 100vh;
+            background: #000;
+            overflow: hidden;
+            cursor: grab;
+        }
+        #landing:active {
+            cursor: grabbing;
+        }
+        #three-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: #000; /* fallback */
+            z-index: 1;
+        }
+        /* CSS2DRenderer overlay */
+        #landing .label-renderer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        #instruction-text {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            pointer-events: none;
+            transition: opacity 1s ease;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+        #view-project-btn {
+            position: absolute;
+            bottom: clamp(80px, 14vh, 120px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 6;
+            padding: 16px 44px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            color: #000;
+            background: #fff;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            white-space: nowrap;
+            opacity: 0.9;
+        }
+        #view-project-btn:hover {
+            background: #f0f0f0;
+            box-shadow: 0 16px 45px rgba(255, 255, 255, 0.4);
+            transform: translateX(-50%) translateY(-4px);
+            letter-spacing: 0.16em;
+            opacity: 1;
+        }
+        #view-project-btn i {
+            margin-right: 8px;
+        }
+
+        /* ===== SECTIONS ===== */
+        .section {
+            padding: 90px 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .section-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.4rem, 5vw, 3.6rem);
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.04em;
+            margin-bottom: 14px;
+        }
+        .divider {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #d4af6f, transparent);
+            margin: 0 auto;
+            border-radius: 2px;
+        }
+
+        /* PROJECTS */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 28px;
+        }
+        .project-card {
+            background: #0a0a0f;
+            border: 1px solid #1a1a2a;
+            border-radius: 24px;
+            padding: 36px 30px;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+            position: relative;
+            overflow: hidden;
+        }
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+        .project-card:hover::before {
+            opacity: 1;
+        }
+        .project-card:hover {
+            border-color: #2e2e48;
+            transform: translateY(-10px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 0 40px rgba(212, 175, 110, 0.08);
+        }
+        .card-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #d4af6f;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .project-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+            letter-spacing: 0.02em;
+        }
+        .project-card p {
+            font-size: 0.88rem;
+            color: #b0b0b0;
+            line-height: 1.7;
+        }
+
+        /* SKILLS */
+        .skills-list {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .skill-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .skill-icon {
+            font-size: 1.7rem;
+            width: 38px;
+            text-align: center;
+            color: #d4af6f;
+        }
+        .skill-info {
+            flex: 1;
+        }
+        .skill-name {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+            color: #ddd;
+            margin-bottom: 5px;
+            font-size: 0.88rem;
+        }
+        .bar-bg {
+            width: 100%;
+            height: 6px;
+            background: #1a1a1a;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #d4af6e, #f5e7c6);
+            border-radius: 6px;
+            transition: width 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* SUPPORT */
+        .support-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px 26px;
+            margin-top: 20px;
+        }
+        .support-item {
+            font-size: 0.88rem;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 8px 20px;
+            border-radius: 40px;
+            transition: all 0.3s;
+        }
+        .support-item:hover {
+            border-color: rgba(212, 175, 110, 0.4);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .support-item i {
+            color: #d4af6f;
+            font-size: 0.8rem;
+        }
+
+        /* CONTACT */
+        .contact-form {
+            max-width: 560px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .contact-form input,
+        .contact-form textarea {
+            background: #0a0a10;
+            border: 1px solid #2a2a36;
+            border-radius: 14px;
+            padding: 16px 18px;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border 0.3s, box-shadow 0.3s;
+            resize: vertical;
+        }
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: #d4af6f;
+            box-shadow: 0 0 18px rgba(212, 175, 110, 0.12);
+        }
+        .send-btn {
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 14px 34px;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            align-self: flex-start;
+            box-shadow: 0 8px 22px rgba(255, 255, 255, 0.16);
+        }
+        .send-btn:hover {
+            background: #e8e8e8;
+            box-shadow: 0 14px 35px rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 36px 20px;
+            color: #444;
+            font-size: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        @media (max-width: 600px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            .support-item {
+                padding: 6px 14px;
+                font-size: 0.78rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== LANDING 3D ===== -->
+    <div id="landing">
+        <canvas id="three-canvas"></canvas>
+        <!-- CSS2D renderer akan ditempatkan di sini oleh JS -->
+        <div id="instruction-text">Geser untuk menjelajahi tata surya</div>
+        <button id="view-project-btn"><i class="fa-solid fa-arrow-down"></i>View Project</button>
+    </div>
+
+    <!-- ===== PROJECTS ===== -->
+    <div id="projects-section" class="section">
+        <div class="section-header">
+            <h2>Project</h2>
+            <div class="divider"></div>
+        </div>
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="card-icon"><i class="fa-brands fa-telegram"></i></div>
+                <h3>Bot KYRO MD</h3>
+                <p>Bot Telegram berbasis Node.js dengan module node-telegram-api. Dilengkapi tombol interaktif yang memanjakan mata.</p>
+            </div>
+            <div class="project-card">
+                <div class="card-icon"><i class="fa-brands fa-spotify"></i></div>
+                <h3>Bot Spotify Music</h3>
+                <p>Bot Telegram pemutar musik berbasis Node.js. Fitur play music responsif dengan kualitas jernih.</p>
+            </div>
+            <div class="project-card">
+                <div class="card-icon"><i class="fa-brands fa-whatsapp"></i></div>
+                <h3>ZETSU MULTI DEVICE</h3>
+                <p>Bot Whatsapp Multi Device dengan banyak fitur Node.js. Fitur nya ada banyak sekitar 50 an.</p>
+            </div>
+            <div class="project-card">
+                <div class="card-icon"><i class="fa-brands fa-chrome"></i></div>
+                <h3>Website Rest Api</h3>
+                <p>Website rest api dengan banyak endpoint dan juga dengan tampilan mewah.</p>
+            </div>
+            <div class="project-card">
+                <div class="card-icon"><i class="fa-solid fa-bolt"></i></div>
+                <h3>Xatanical</h3>
+                <p>Proyek aplikasi, bot Telegram &amp; WhatsApp untuk pengujian ketahanan perangkat. Dapat menyebabkan crash, delay, atau blank.</p>
+            </div>
+            <div class="project-card">
+                <div class="card-icon"><i class="fa-brands fa-telegram"></i></div>
+                <h3>Bot Auto Band User</h3>
+                <p>Bot telegram dengan fitur auto ban user yang keluar dari channel telegram bersis node.js module telegraf</p>
+            </div>
+            <div class="project-card">
+                <div class="card-icon"><i class="fa-brands fa-cloudflare"></i></div>
+                <h3>Protek Panel</h3>
+                <p>Script protek server panel anti ddos dengan fail2ban tanpa proteksi cloudflare.</p>
+            </div>
+            <div class="project-card">
+                <div class="card-icon"><i class="fa-brands fa-telegram"></i></div>
+                <h3>Bot Ai Chatgpt</h3>
+                <p>Bot telegram ai dengan model ChatGpt berbasis node.js module node-telegram-api.</p>
+            </div>
+            <div class="project-card">
+                <div class="card-icon"><i class="fa-brands fa-telegram"></i></div>
+                <h3>Bot Cpanel</h3>
+                <p>Bot telegram create panel berbasis node.js module node-telegram-api dengan tampilan simple yang mudah dipakai.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SKILLS ===== -->
+    <div id="skills-section" class="section">
+        <div class="section-header">
+            <h2>Skill</h2>
+            <div class="divider"></div>
+        </div>
+        <div class="skills-list">
+            <div class="skill-item">
+                <div class="skill-icon"><i class="fa-brands fa-js"></i></div>
+                <div class="skill-info">
+                    <div class="skill-name"><span>JavaScript</span><span>70%</span></div>
+                    <div class="bar-bg"><div class="bar-fill" data-width="70"></div></div>
+                </div>
+            </div>
+            <div class="skill-item">
+                <div class="skill-icon"><i class="fa-brands fa-python"></i></div>
+                <div class="skill-info">
+                    <div class="skill-name"><span>Python</span><span>75%</span></div>
+                    <div class="bar-bg"><div class="bar-fill" data-width="75"></div></div>
+                </div>
+            </div>
+            <div class="skill-item">
+                <div class="skill-icon"><i class="fa-brands fa-html5"></i></div>
+                <div class="skill-info">
+                    <div class="skill-name"><span>HTML</span><span>83%</span></div>
+                    <div class="bar-bg"><div class="bar-fill" data-width="83"></div></div>
+                </div>
+            </div>
+            <div class="skill-item">
+                <div class="skill-icon"><i class="fa-brands fa-css3-alt"></i></div>
+                <div class="skill-info">
+                    <div class="skill-name"><span>CSS</span><span>25%</span></div>
+                    <div class="bar-bg"><div class="bar-fill" data-width="25"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SUPPORT ===== -->
+    <div id="support-section" class="section">
+        <div class="section-header">
+            <h2>Support</h2>
+            <div class="divider"></div>
+            <p style="margin-top: 18px; color: #aaa; font-size: 0.85rem;">Allah &bull; Parents &bull; Friends</p>
+        </div>
+        <div class="support-grid">
+            <div class="support-item"><i class="fa-solid fa-star"></i> Ahan</div>
+            <div class="support-item"><i class="fa-solid fa-star"></i> Iksan</div>
+            <div class="support-item"><i class="fa-solid fa-star"></i> Trian</div>
+            <div class="support-item"><i class="fa-solid fa-star"></i> Aldo</div>
+            <div class="support-item"><i class="fa-solid fa-star"></i> Freisia</div>
+            <div class="support-item"><i class="fa-solid fa-star"></i> Linda</div>
+            <div class="support-item"><i class="fa-solid fa-star"></i> Angkasa</div>
+            <div class="support-item"><i class="fa-solid fa-star"></i> Yucan</div>
+            <div class="support-item"><i class="fa-solid fa-star"></i> Rikz</div>
+            <div class="support-item"><i class="fa-solid fa-star"></i> Akbar</div>
+            <div class="support-item"><i class="fa-solid fa-star"></i> Zy</div>
+        </div>
+        <p style="text-align: center; margin-top: 28px; color: #888; font-size: 0.85rem;">Terima kasih sudah support!</p>
+    </div>
+
+    <!-- ===== CONTACT ===== -->
+    <div id="contact-section" class="section">
+        <div class="section-header">
+            <h2>Kirim Pesan</h2>
+            <div class="divider"></div>
+        </div>
+        <form class="contact-form" action="https://formspree.io/f/xqkrbqov" method="POST">
+            <input type="text" name="name" placeholder="Nama" required />
+            <input type="email" name="email" placeholder="Email" required />
+            <textarea name="message" rows="5" placeholder="Pesan untuk ..." required></textarea>
+            <button type="submit" class="send-btn"><i class="fa-solid fa-paper-plane"></i> Kirim</button>
+        </form>
+        <p style="text-align: center; margin-top: 18px; color: #555; font-size: 0.78rem;">Pesan akan dikirim ke email pribadi</p>
+    </div>
+
+    <footer>&copy; 2026 — KYRO</footer>
+
+    <!-- ===== THREE.JS ===== -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        // ============================================================
+        //  IMPORTS
+        // ============================================================
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // ============================================================
+        //  DOM REFS
+        // ============================================================
+        const landing = document.getElementById('landing');
+        const canvas = document.getElementById('three-canvas');
+        const instructionText = document.getElementById('instruction-text');
+        const viewBtn = document.getElementById('view-project-btn');
+
+        // ============================================================
+        //  SCENE
+        // ============================================================
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+
+        // ============================================================
+        //  CAMERA
+        // ============================================================
+        const camera = new THREE.PerspectiveCamera(45, landing.clientWidth / landing.clientHeight, 0.1, 100);
+        camera.position.set(0, 4, 12);
+        camera.lookAt(0, 0, 0);
+
+        // ============================================================
+        //  WEBGL RENDERER
+        // ============================================================
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: false,
+            powerPreference: "high-performance",
+        });
+        renderer.setSize(landing.clientWidth, landing.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        renderer.setClearColor(0x000000, 1); // pastikan hitam
+
+        // ============================================================
+        //  CSS2D RENDERER (label)
+        // ============================================================
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(landing.clientWidth, landing.clientHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0';
+        labelRenderer.domElement.style.left = '0';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        labelRenderer.domElement.style.zIndex = '2';
+        // Tambahkan ke landing dengan class untuk styling
+        labelRenderer.domElement.classList.add('label-renderer');
+        landing.appendChild(labelRenderer.domElement);
+
+        // ============================================================
+        //  CONTROLS
+        // ============================================================
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.target.set(0, 0, 0);
+        controls.minDistance = 4;
+        controls.maxDistance = 22;
+        controls.maxPolarAngle = Math.PI / 1.7;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.2;
+        controls.update();
+
+        // sembunyikan instruksi setelah interaksi
+        let userInteracted = false;
+
+        function hideInstruction() {
+            if (!userInteracted) {
+                userInteracted = true;
+                instructionText.style.opacity = '0';
+                setTimeout(() => { instructionText.style.display = 'none'; }, 1000);
+            }
+        }
+        renderer.domElement.addEventListener('pointerdown', hideInstruction);
+        renderer.domElement.addEventListener('wheel', hideInstruction);
+
+        // ============================================================
+        //  LIGHTING
+        // ============================================================
+        const ambient = new THREE.AmbientLight(0x222244, 0.6);
+        scene.add(ambient);
+
+        const sunLight = new THREE.PointLight(0xffeedd, 120, 30, 1);
+        sunLight.position.set(0, 0, 0);
+        scene.add(sunLight);
+
+        const fillLight = new THREE.DirectionalLight(0x4466aa, 0.4);
+        fillLight.position.set(1, 1, 1);
+        scene.add(fillLight);
+
+        const backLight = new THREE.DirectionalLight(0xaa8866, 0.3);
+        backLight.position.set(-1, 0.5, -1);
+        scene.add(backLight);
+
+        // ============================================================
+        //  TEXTURE GENERATOR (procedural)
+        // ============================================================
+        function createCanvasTexture(width, height, drawFn) {
+            const c = document.createElement('canvas');
+            c.width = width;
+            c.height = height;
+            const ctx = c.getContext('2d');
+            drawFn(ctx, width, height);
+            const tex = new THREE.CanvasTexture(c);
+            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+            tex.anisotropy = 4;
+            return tex;
+        }
+
+        // ---- Merkurius ----
+        function drawMercury(ctx, w, h) {
+            const grad = ctx.createRadialGradient(w * 0.4, h * 0.4, 0, w * 0.5, h * 0.5, w * 0.6);
+            grad.addColorStop(0, '#b0b0b0');
+            grad.addColorStop(0.5, '#888888');
+            grad.addColorStop(1, '#555555');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            for (let i = 0; i < 80; i++) {
+                const x = Math.random() * w,
+                    y = Math.random() * h,
+                    r = 1 + Math.random() * 4;
+                const a = 0.2 + Math.random() * 0.4;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(60,60,60,${a})`;
+                ctx.fill();
+            }
+        }
+
+        // ---- Venus ----
+        function drawVenus(ctx, w, h) {
+            const grad = ctx.createRadialGradient(w * 0.3, h * 0.3, 0, w * 0.5, h * 0.5, w * 0.7);
+            grad.addColorStop(0, '#f5d6a0');
+            grad.addColorStop(0.6, '#d4a870');
+            grad.addColorStop(1, '#b08040');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            for (let i = 0; i < 120; i++) {
+                const x = Math.random() * w,
+                    y = Math.random() * h;
+                const r = 3 + Math.random() * 8;
+                const a = 0.05 + Math.random() * 0.15;
+                ctx.beginPath();
+                ctx.ellipse(x, y, r, r * 0.6, Math.random() * Math.PI, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(200,160,100,${a})`;
+                ctx.fill();
+            }
+        }
+
+        // ---- Bumi ----
+        function drawEarth(ctx, w, h) {
+            const grad = ctx.createRadialGradient(w * 0.4, h * 0.3, 0, w * 0.5, h * 0.5, w * 0.7);
+            grad.addColorStop(0, '#5a9fd4');
+            grad.addColorStop(0.5, '#2a7ab0');
+            grad.addColorStop(1, '#1a4a70');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            // daratan
+            const land = [
+                [0.2, 0.2, 0.15, 0.12],
+                [0.5, 0.15, 0.2, 0.1],
+                [0.7, 0.3, 0.12, 0.15],
+                [0.3, 0.5, 0.2, 0.15],
+                [0.6, 0.55, 0.15, 0.12],
+                [0.15, 0.6, 0.1, 0.1],
+                [0.8, 0.6, 0.1, 0.08],
+                [0.4, 0.7, 0.18, 0.1],
+            ];
+            land.forEach(([cx, cy, rw, rh]) => {
+                ctx.beginPath();
+                ctx.ellipse(cx * w, cy * h, rw * w, rh * h, Math.random() * 0.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#3a8a3a';
+                ctx.fill();
+                ctx.fillStyle = 'rgba(70,160,70,0.3)';
+                ctx.beginPath();
+                ctx.ellipse(cx * w + 5, cy * h - 5, rw * w * 0.7, rh * h * 0.7, 0, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            // awan
+            for (let i = 0; i < 30; i++) {
+                const x = Math.random() * w,
+                    y = Math.random() * h;
+                const r = 5 + Math.random() * 15;
+                const a = 0.04 + Math.random() * 0.1;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255,255,255,${a})`;
+                ctx.fill();
+            }
+        }
+
+        // ---- Mars ----
+        function drawMars(ctx, w, h) {
+            const grad = ctx.createRadialGradient(w * 0.4, h * 0.4, 0, w * 0.5, h * 0.5, w * 0.6);
+            grad.addColorStop(0, '#e07040');
+            grad.addColorStop(0.5, '#c04030');
+            grad.addColorStop(1, '#802020');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            for (let i = 0; i < 60; i++) {
+                const x = Math.random() * w,
+                    y = Math.random() * h;
+                const r = 2 + Math.random() * 6;
+                const a = 0.1 + Math.random() * 0.3;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(100,30,20,${a})`;
+                ctx.fill();
+            }
+            // kutub
+            ctx.beginPath();
+            ctx.ellipse(w * 0.5, h * 0.1, w * 0.2, h * 0.05, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(220,200,180,0.3)';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(w * 0.5, h * 0.9, w * 0.2, h * 0.05, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(220,200,180,0.3)';
+            ctx.fill();
+        }
+
+        // ---- Jupiter ----
+        function drawJupiter(ctx, w, h) {
+            const grad = ctx.createLinearGradient(0, 0, 0, h);
+            const colors = ['#d4a070', '#c89060', '#e8c090', '#b08050', '#d4a070', '#c08050', '#e0b080', '#b08050'];
+            const stops = [0, 0.15, 0.3, 0.45, 0.55, 0.7, 0.85, 1];
+            const grad2 = ctx.createLinearGradient(0, 0, 0, h);
+            stops.forEach((s, i) => grad2.addColorStop(s, colors[i % colors.length]));
+            ctx.fillStyle = grad2;
+            ctx.fillRect(0, 0, w, h);
+            // bintik merah
+            ctx.beginPath();
+            ctx.ellipse(w * 0.6, h * 0.55, w * 0.08, h * 0.05, 0.2, 0, Math.PI * 2);
+            ctx.fillStyle = '#b04030';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(w * 0.62, h * 0.56, w * 0.06, h * 0.035, 0.2, 0, Math.PI * 2);
+            ctx.fillStyle = '#d06040';
+            ctx.fill();
+            // garis-garis kabur
+            for (let i = 0; i < 20; i++) {
+                const y = Math.random() * h;
+                const a = 0.05 + Math.random() * 0.1;
+                ctx.fillStyle = `rgba(0,0,0,${a})`;
+                ctx.fillRect(0, y, w, 1 + Math.random() * 3);
+            }
+            for (let i = 0; i < 20; i++) {
+                const y = Math.random() * h;
+                const a = 0.05 + Math.random() * 0.1;
+                ctx.fillStyle = `rgba(255,255,255,${a})`;
+                ctx.fillRect(0, y, w, 1 + Math.random() * 2);
+            }
+        }
+
+        // ---- Saturnus ----
+        function drawSaturn(ctx, w, h) {
+            const grad = ctx.createRadialGradient(w * 0.4, h * 0.4, 0, w * 0.5, h * 0.5, w * 0.6);
+            grad.addColorStop(0, '#f0d8a0');
+            grad.addColorStop(0.5, '#d4b880');
+            grad.addColorStop(1, '#a08850');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            for (let i = 0; i < 50; i++) {
+                const y = Math.random() * h;
+                const a = 0.03 + Math.random() * 0.08;
+                ctx.fillStyle = `rgba(0,0,0,${a})`;
+                ctx.fillRect(0, y, w, 1 + Math.random() * 2);
+            }
+        }
+
+        // ---- Uranus ----
+        function drawUranus(ctx, w, h) {
+            const grad = ctx.createRadialGradient(w * 0.4, h * 0.4, 0, w * 0.5, h * 0.5, w * 0.6);
+            grad.addColorStop(0, '#b0e0e8');
+            grad.addColorStop(0.5, '#70b8c8');
+            grad.addColorStop(1, '#308090');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            for (let i = 0; i < 40; i++) {
+                const y = Math.random() * h;
+                const a = 0.02 + Math.random() * 0.06;
+                ctx.fillStyle = `rgba(255,255,255,${a})`;
+                ctx.fillRect(0, y, w, 1 + Math.random() * 2);
+            }
+        }
+
+        // ---- Neptunus ----
+        function drawNeptune(ctx, w, h) {
+            const grad = ctx.createRadialGradient(w * 0.4, h * 0.4, 0, w * 0.5, h * 0.5, w * 0.6);
+            grad.addColorStop(0, '#6080d0');
+            grad.addColorStop(0.5, '#3048a0');
+            grad.addColorStop(1, '#182860');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            for (let i = 0; i < 30; i++) {
+                const x = Math.random() * w,
+                    y = Math.random() * h;
+                const r = 3 + Math.random() * 8;
+                const a = 0.05 + Math.random() * 0.1;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(100,140,255,${a})`;
+                ctx.fill();
+            }
+        }
+
+        // ---- Pluto ----
+        function drawPluto(ctx, w, h) {
+            const grad = ctx.createRadialGradient(w * 0.4, h * 0.4, 0, w * 0.5, h * 0.5, w * 0.6);
+            grad.addColorStop(0, '#b0a080');
+            grad.addColorStop(0.5, '#8a7a60');
+            grad.addColorStop(1, '#5a4a3a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            for (let i = 0; i < 40; i++) {
+                const x = Math.random() * w,
+                    y = Math.random() * h;
+                const r = 1 + Math.random() * 3;
+                const a = 0.1 + Math.random() * 0.3;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(40,30,20,${a})`;
+                ctx.fill();
+            }
+        }
+
+        const textureMap = {
+            Merkurius: createCanvasTexture(512, 256, drawMercury),
+            Venus: createCanvasTexture(512, 256, drawVenus),
+            Bumi: createCanvasTexture(512, 256, drawEarth),
+            Mars: createCanvasTexture(512, 256, drawMars),
+            Jupiter: createCanvasTexture(512, 256, drawJupiter),
+            Saturnus: createCanvasTexture(512, 256, drawSaturn),
+            Uranus: createCanvasTexture(512, 256, drawUranus),
+            Neptunus: createCanvasTexture(512, 256, drawNeptune),
+            pluto: createCanvasTexture(512, 256, drawPluto),
+        };
+
+        // ============================================================
+        //  MATAHARI (dengan glow & corona)
+        // ============================================================
+        const sunGeo = new THREE.SphereGeometry(0.5, 64, 64);
+        const sunMat = new THREE.MeshBasicMaterial({ color: 0xffeedd });
+        const sunMesh = new THREE.Mesh(sunGeo, sunMat);
+        scene.add(sunMesh);
+
+        // Glow utama
+        const glowMat = new THREE.ShaderMaterial({
+            uniforms: {
+                uTime: { value: 0 },
+                uColor: { value: new THREE.Color(0xffeedd) },
+            },
+            vertexShader: `
+            varying vec3 vNormal;
+            varying vec3 vPos;
+            void main() {
+              vNormal   = normalize(normalMatrix * normal);
+              vec4 wp   = modelMatrix * vec4(position, 1.0);
+              vPos      = wp.xyz;
+              gl_Position = projectionMatrix * viewMatrix * wp;
+            }
+          `,
+            fragmentShader: `
+            uniform vec3 uColor;
+            uniform float uTime;
+            varying vec3 vNormal;
+            varying vec3 vPos;
+            void main() {
+              vec3 viewDir = normalize(cameraPosition - vPos);
+              float fresnel = 1.0 - abs(dot(viewDir, vNormal));
+              fresnel = pow(fresnel, 3.0);
+              float pulse = 0.8 + 0.2 * sin(uTime * 0.8);
+              float alpha = fresnel * 0.75 * pulse;
+              gl_FragColor = vec4(uColor, alpha);
+            }
+          `,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+        });
+        const glowMesh = new THREE.Mesh(new THREE.SphereGeometry(0.85, 48, 48), glowMat);
+        scene.add(glowMesh);
+
+        // Corona besar
+        const coronaMat = new THREE.ShaderMaterial({
+            uniforms: {
+                uColor: { value: new THREE.Color(0xffaa66) },
+                uTime: { value: 0 },
+            },
+            vertexShader: `
+            varying vec3 vNormal;
+            varying vec3 vPos;
+            void main() {
+              vNormal   = normalize(normalMatrix * normal);
+              vec4 wp   = modelMatrix * vec4(position, 1.0);
+              vPos      = wp.xyz;
+              gl_Position = projectionMatrix * viewMatrix * wp;
+            }
+          `,
+            fragmentShader: `
+            uniform vec3 uColor;
+            uniform float uTime;
+            varying vec3 vNormal;
+            varying vec3 vPos;
+            void main() {
+              vec3 viewDir = normalize(cameraPosition - vPos);
+              float fresnel = 1.0 - abs(dot(viewDir, vNormal));
+              fresnel = pow(fresnel, 5.0);
+              float pulse = 0.7 + 0.3 * sin(uTime * 0.5 + 1.2);
+              float alpha = fresnel * 0.3 * pulse;
+              gl_FragColor = vec4(uColor, alpha);
+            }
+          `,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+        });
+        const corona = new THREE.Mesh(new THREE.SphereGeometry(1.5, 32, 32), coronaMat);
+        scene.add(corona);
+
+        // ============================================================
+        //  LABEL KYRO (CSS2D)
+        // ============================================================
+        const kyroDiv = document.createElement('div');
+        kyroDiv.textContent = 'KYRO';
+        kyroDiv.style.fontFamily = "'Playfair Display', serif";
+        kyroDiv.style.fontSize = 'clamp(2.8rem, 6vw, 4.8rem)';
+        kyroDiv.style.fontWeight = '900';
+        kyroDiv.style.color = '#000';
+        kyroDiv.style.textShadow = '0 0 40px rgba(255,255,255,0.9), 0 0 80px rgba(212,175,110,0.7), 0 0 120px rgba(255,255,255,0.3)';
+        kyroDiv.style.letterSpacing = '0.08em';
+        kyroDiv.style.userSelect = 'none';
+        kyroDiv.style.pointerEvents = 'none';
+        const kyroLabel = new CSS2DObject(kyroDiv);
+        kyroLabel.position.set(0, 0, 0);
+        scene.add(kyroLabel);
+
+        // ============================================================
+        //  PLANET DATA
+        // ============================================================
+        const planetData = [
+            { name: 'Merkurius', color: 0xaaaaaa, size: 0.09, dist: 1.4, speed: 0.022, tex: 'Merkurius' },
+            { name: 'Venus', color: 0xe8cda0, size: 0.13, dist: 1.9, speed: 0.016, tex: 'Venus' },
+            { name: 'Bumi', color: 0x5599dd, size: 0.14, dist: 2.4, speed: 0.013, tex: 'Bumi' },
+            { name: 'Mars', color: 0xcc5533, size: 0.11, dist: 2.9, speed: 0.011, tex: 'Mars' },
+            { name: 'Jupiter', color: 0xd4a070, size: 0.32, dist: 3.8, speed: 0.008, tex: 'Jupiter' },
+            { name: 'Saturnus', color: 0xe8d5a0, size: 0.27, dist: 4.8, speed: 0.006, tex: 'Saturnus', ring: true },
+            { name: 'Uranus', color: 0x88ccdd, size: 0.22, dist: 5.8, speed: 0.0045, tex: 'Uranus' },
+            { name: 'Neptunus', color: 0x4466cc, size: 0.21, dist: 6.8, speed: 0.0035, tex: 'Neptunus' },
+            { name: 'pluto', color: 0xbbaa88, size: 0.07, dist: 7.6, speed: 0.0018, tex: 'pluto' },
+        ];
+
+        const planets = [];
+
+        planetData.forEach((data) => {
+            // Orbit ring
+            const orbitGeo = new THREE.TorusGeometry(data.dist, 0.006, 8, 100);
+            const orbitMat = new THREE.MeshBasicMaterial({ color: 0x444466, transparent: true, opacity: 0.25 });
+            const orbit = new THREE.Mesh(orbitGeo, orbitMat);
+            orbit.rotation.x = Math.PI / 2;
+            scene.add(orbit);
+
+            // Group planet (untuk rotasi orbit)
+            const group = new THREE.Group();
+            scene.add(group);
+
+            // Planet mesh dengan tekstur
+            const geo = new THREE.SphereGeometry(data.size, 48, 48);
+            const tex = textureMap[data.tex] || null;
+            const mat = new THREE.MeshStandardMaterial({
+                map: tex,
+                roughness: 0.6,
+                metalness: 0.1,
+                color: tex ? 0xffffff : data.color,
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(data.dist, 0, 0);
+            group.add(mesh);
+
+            // Glow planet
+            const pGlowMat = new THREE.ShaderMaterial({
+                uniforms: { uColor: { value: new THREE.Color(data.color) } },
+                vertexShader: `
+              varying vec3 vN; varying vec3 vP;
+              void main() {
+                vN = normalize(normalMatrix * normal);
+                vec4 wp = modelMatrix * vec4(position, 1.0);
+                vP = wp.xyz;
+                gl_Position = projectionMatrix * viewMatrix * wp;
+              }
+            `,
+                fragmentShader: `
+              uniform vec3 uColor;
+              varying vec3 vN; varying vec3 vP;
+              void main() {
+                vec3 viewDir = normalize(cameraPosition - vP);
+                float fresnel = 1.0 - abs(dot(viewDir, vN));
+                fresnel = pow(fresnel, 3.0);
+                float alpha = fresnel * 0.35;
+                gl_FragColor = vec4(uColor, alpha);
+              }
+            `,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+            });
+            const pGlow = new THREE.Mesh(new THREE.SphereGeometry(data.size * 2.0, 24, 24), pGlowMat);
+            mesh.add(pGlow);
+
+            // Cincin Saturnus
+            if (data.ring) {
+                const ringGeo = new THREE.TorusGeometry(data.size * 1.7, data.size * 0.25, 20, 80);
+                const ringMat = new THREE.MeshStandardMaterial({
+                    color: 0xd4b888,
+                    roughness: 0.7,
+                    metalness: 0.2,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.85,
+                });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.rotation.x = Math.PI / 2.4;
+                ring.position.copy(mesh.position);
+                group.add(ring);
+
+                // cincin dalam
+                const ring2Geo = new THREE.TorusGeometry(data.size * 1.3, data.size * 0.12, 16, 64);
+                const ring2Mat = new THREE.MeshStandardMaterial({
+                    color: 0xc0a070,
+                    roughness: 0.6,
+                    metalness: 0.1,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.5,
+                });
+                const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
+                ring2.rotation.x = Math.PI / 2.4;
+                ring2.position.copy(mesh.position);
+                group.add(ring2);
+            }
+
+            // Label CSS2D
+            const labelDiv = document.createElement('div');
+            labelDiv.textContent = data.name;
+            labelDiv.style.fontFamily = "'Inter', sans-serif";
+            labelDiv.style.fontSize = '0.55rem';
+            labelDiv.style.color = '#ccc';
+            labelDiv.style.letterSpacing = '0.06em';
+            labelDiv.style.textShadow = '0 0 8px rgba(0,0,0,0.9)';
+            labelDiv.style.background = 'rgba(0,0,0,0.4)';
+            labelDiv.style.padding = '2px 8px';
+            labelDiv.style.borderRadius = '10px';
+            labelDiv.style.backdropFilter = 'blur(2px)';
+            const label = new CSS2DObject(labelDiv);
+            label.position.set(data.dist, data.size + 0.25, 0);
+            group.add(label);
+
+            planets.push({
+                group,
+                dist: data.dist,
+                speed: data.speed,
+                angle: Math.random() * Math.PI * 2,
+                mesh,
+                rotSpeed: 0.005 + Math.random() * 0.01,
+            });
+        });
+
+        // ============================================================
+        //  BINTANG
+        // ============================================================
+        const starsGeo = new THREE.BufferGeometry();
+        const starCount = 1200;
+        const pos = new Float32Array(starCount * 3);
+        const sizes = new Float32Array(starCount);
+        for (let i = 0; i < starCount; i++) {
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            const r = 12 + Math.random() * 18;
+            pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+            pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+            pos[i * 3 + 2] = r * Math.cos(phi);
+            sizes[i] = 0.02 + Math.random() * 0.05;
+        }
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        starsGeo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+        const starMat = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 0.04,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            transparent: true,
+            opacity: 0.9,
+            sizeAttenuation: true,
+        });
+        const stars = new THREE.Points(starsGeo, starMat);
+        scene.add(stars);
+
+        // ============================================================
+        //  RESIZE
+        // ============================================================
+        function resize() {
+            const w = landing.clientWidth;
+            const h = landing.clientHeight;
+            if (w === 0 || h === 0) return;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+            labelRenderer.setSize(w, h);
+        }
+        window.addEventListener('resize', resize);
+        // panggil sekali untuk memastikan
+        setTimeout(resize, 100);
+
+        // ============================================================
+        //  VIEW PROJECT
+        // ============================================================
+        viewBtn.addEventListener('click', () => {
+            document.getElementById('projects-section').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // ============================================================
+        //  SKILL BARS
+        // ============================================================
+        const bars = document.querySelectorAll('.bar-fill');
+        const barObserver = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.width = e.target.dataset.width + '%';
+                    barObserver.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.3 });
+        bars.forEach(b => barObserver.observe(b));
+
+        // ============================================================
+        //  ANIMATION LOOP
+        // ============================================================
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+            const elapsed = performance.now() * 0.001;
+
+            // Orbit planet
+            planets.forEach(p => {
+                p.angle += p.speed * (delta * 60);
+                p.group.rotation.y = p.angle;
+                // Rotasi planet pada sumbunya
+                p.mesh.rotation.y += p.rotSpeed * (delta * 60);
+            });
+
+            // Animasi matahari
+            sunMesh.rotation.y += 0.002;
+            glowMat.uniforms.uTime.value = elapsed;
+            coronaMat.uniforms.uTime.value = elapsed;
+
+            // Bintang berputar lambat
+            stars.rotation.y += 0.00008;
+            stars.rotation.x += 0.00003;
+
+            controls.update();
+
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+
+        animate();
+
+        // ============================================================
+        //  ERROR HANDLING
+        // ============================================================
+        console.log('✅ KYRO 3D Solar System loaded successfully!');
+    </script>
+
+</body>
+</html>
